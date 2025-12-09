@@ -2,12 +2,14 @@ import express, { Request, Response } from "express";
 import initDB from "./config/db";
 import { vehiclesRoutes } from "./modules/vehicles/vehicles.routes";
 import { authRoutes } from "./modules/auth/auth.routes";
+import { usersRoutes } from "./modules/users/users.routes";
 
 const app = express();
 app.use(express.json());
 initDB();
 app.use("/api/v1", vehiclesRoutes);
 app.use("/api/v1", authRoutes);
+app.use("/api/v1", usersRoutes);
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({
     success: true,
