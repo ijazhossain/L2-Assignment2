@@ -5,8 +5,8 @@ import jwt from "jsonwebtoken";
 const signupUser = async (payload: Record<string, unknown>) => {
   const { name, email, password, phone, role } = payload;
   if (!password || (password as string).length < 6) {
-  throw new Error("Password must be at least 6 characters long");
-}
+    throw new Error("Password must be at least 6 characters long");
+  }
   const hashedPassword = await bcrypt.hash(password as string, 10);
   const result = await pool.query(
     `
@@ -23,20 +23,22 @@ const loginUser = async (email: string, password: string) => {
     return null;
   }
   const originalUser = result.rows[0];
+  console.log({ originalUser });
   const match = await bcrypt.compare(password, originalUser.password);
   if (!match) {
-    return false;
+    throw new Error("Incorrect Password!");
   }
   const token = jwt.sign(
     {
+      id: originalUser.id,
       name: originalUser.name,
       email: originalUser.email,
-      role: originalUser.email,
+      role: originalUser.role,
     },
     config.jwt_secret as string,
     { expiresIn: "7d" }
   );
-  
+
   const user = {
     id: result.rows[0].id,
     name: result.rows[0].name,
