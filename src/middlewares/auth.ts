@@ -8,11 +8,16 @@ const auth = (...roles: string[]) => {
       if (!authorization) {
         return res.status(401).json({ message: "You are not authorized!!" });
       }
-      const token=authorization.split(" ")[1];
+      const token = authorization.split(" ")[1];
 
-      const decoded = jwt.verify(token!, config.jwt_secret as string)as JwtPayload;
-      console.log({ decoded });
-      req.user = decoded ;
+      const decoded = jwt.verify(
+        token!,
+        config.jwt_secret as string
+      ) as JwtPayload;
+      //   console.log({ decoded });
+
+      req.user = decoded;
+
       if (roles.length && !roles.includes(decoded.role as string)) {
         return res.status(403).json({
           message: "Forbidden access!",
