@@ -6,6 +6,9 @@ const createBookingsIntoDB = async (payload: Record<string, unknown>) => {
     `SELECT id,vehicle_name, daily_rent_price, availability_status FROM vehicles WHERE ID=$1`,
     [vehicle_id]
   );
+  if(reqVehicle.rows.length===0){
+    throw new Error("Vehicle not Found for booking!")
+  }
   //   console.log(reqVehicle.rows[0]);
   const { id, vehicle_name, daily_rent_price, availability_status } =
     reqVehicle.rows[0];
@@ -92,7 +95,7 @@ const updateBookingsIntoDB = async (
       `UPDATE bookings SET 
     status=$1 
     WHERE ID=$2 
-    RETURNING *`,
+    RETURNING id, customer_id, vehicle_id, TO_CHAR(rent_start_date, 'YYYY-MM-DD') AS rent_start_date, TO_CHAR(rent_end_date, 'YYYY-MM-DD') AS rent_end_date, total_price, status`,
       [payload.status, id]
     );
     return result;

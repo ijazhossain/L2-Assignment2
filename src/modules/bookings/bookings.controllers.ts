@@ -74,7 +74,7 @@ const updateBookings = async (req: Request, res: Response) => {
         );
         let data = result?.rows[0];
         data.vehicle = vehicle.rows[0];
-        console.log(data);
+        // console.log(data);
         res.status(200).json({
           success: true,
           message: "Booking marked as returned. Vehicle is now available",

@@ -4,7 +4,8 @@ import { vehiclesServices } from "./vehicles.services";
 const createVehicle = async (req: Request, res: Response) => {
   try {
     const result = await vehiclesServices.createVehiclesIntoDB(req.body);
-    console.log(result);
+    // console.log(result);
+
     res.status(201).json({
       success: true,
       message: "Vehicle created successfully",
@@ -21,11 +22,20 @@ const createVehicle = async (req: Request, res: Response) => {
 const getVehicles = async (req: Request, res: Response) => {
   try {
     const result = await vehiclesServices.getVehiclesFromDB();
-    res.status(200).json({
-      success: true,
-      message: "Vehicles retrieved successfully",
-      data: result.rows,
-    });
+    // console.log(result.rows);
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "Vehicles not found",
+        data: result.rows,
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "Vehicles retrieved successfully",
+        data: result.rows,
+      });
+    }
   } catch (err: any) {
     res.status(400).json({
       success: false,
@@ -39,11 +49,19 @@ const getSingleVehicle = async (req: Request, res: Response) => {
     const result = await vehiclesServices.getVehicleFromDB(
       req.params.vehicleId as string
     );
-    res.status(200).json({
-      success: true,
-      message: "Vehicle retrieved successfully",
-      data: result.rows,
-    });
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "Vehicle not found",
+        data: {},
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: "Vehicle retrieved successfully",
+        data: result.rows[0],
+      });
+    }
   } catch (err: any) {
     res.status(400).json({
       success: false,
@@ -62,12 +80,13 @@ const updateVehicle = async (req: Request, res: Response) => {
       res.status(404).json({
         success: false,
         message: "Vehicle not found",
+        data: {},
       });
     } else {
       res.status(200).json({
         success: true,
         message: "Vehicle updated successfully",
-        data: result.rows,
+        data: result.rows[0],
       });
     }
   } catch (err: any) {
@@ -88,6 +107,7 @@ const deleteVehicle = async (req: Request, res: Response) => {
       res.status(404).json({
         success: false,
         message: "Vehicle not found",
+        data: {},
       });
     } else {
       res.status(200).json({
@@ -98,7 +118,7 @@ const deleteVehicle = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(400).json({
       success: false,
-      message: err.message || "Vehicle updated failed!!",
+      message: err.message || "Vehicle deletion failed!!",
       errors: err,
     });
   }

@@ -22,11 +22,17 @@ const loginUser = async (req: Request, res: Response) => {
 
   try {
     const result = await authServices.loginUser(email, password);
-    res.status(200).json({
+    if (result === null) {
+    res.status(404).json({
+      success: false,
+      message: "User not found",
+      data: result});
+  }else{
+    res.status(404).json({
       success: true,
       message: "Login successful",
       data: result,
-    });
+    });}
   } catch (err: any) {
     res.status(500).json({
       success: false,
