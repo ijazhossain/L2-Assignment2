@@ -1,4 +1,4 @@
-# Project Name
+# Project Name: Car rental system
 
 **Live URL:** https://car-rental-system-lovat.vercel.app/  
 **GitHub Repository:** https://github.com/ijazhossain/L2-Assignment2
