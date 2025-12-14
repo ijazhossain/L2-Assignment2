@@ -6,8 +6,8 @@ const createBookingsIntoDB = async (payload: Record<string, unknown>) => {
     `SELECT id,vehicle_name, daily_rent_price, availability_status FROM vehicles WHERE ID=$1`,
     [vehicle_id]
   );
-  if(reqVehicle.rows.length===0){
-    throw new Error("Vehicle not Found for booking!")
+  if (reqVehicle.rows.length === 0) {
+    throw new Error("Vehicle not Found for booking!");
   }
   //   console.log(reqVehicle.rows[0]);
   const { id, vehicle_name, daily_rent_price, availability_status } =
@@ -38,9 +38,10 @@ const createBookingsIntoDB = async (payload: Record<string, unknown>) => {
 
   return { result, vehicle };
 };
-const getBookingsFromDB = async (role: string, id: string) => {
+const getBookingsFromDB = async (payload: Record<string, unknown>) => {
   //   console.log({ role, id });
- 
+  const { id, name, email, role } = payload;
+
   let result;
   if (role === "admin") {
     result = await pool.query(
@@ -54,36 +55,54 @@ const getBookingsFromDB = async (role: string, id: string) => {
       `SELECT id, customer_id, vehicle_id, TO_CHAR(rent_start_date, 'YYYY-MM-DD') AS rent_start_date, TO_CHAR(rent_end_date, 'YYYY-MM-DD') AS rent_end_date, total_price, status FROM bookings WHERE CUSTOMER_ID=$1`,
       [id]
     );
-  }else{
+  } else {
     return [];
   }
-const today = new Date();
-for (const bookings of result.rows){
-    const endDate= new Date(bookings.rent_end_date);
-    if(endDate<today && bookings.status !== "returned"){
-        await pool.query(
-            `UPDATE bookings SET status='returned' WHERE id=$1`,
-            [bookings.id]
-        );
-        bookings.status="returned";
+
+  const today = new Date();
+  for (const bookings of result.rows) {
+    const endDate = new Date(bookings.rent_end_date);
+    if (endDate < today && bookings.status !== "returned") {
+      await pool.query(`UPDATE bookings SET status='returned' WHERE id=$1`, [
+        bookings.id,
+      ]);
+
+      bookings.status = "returned";
     }
-}
-  return result?.rows??[];
+    const customer = await pool.query(
+      `SELECT name,email FROM users WHERE ID=$1`,
+      [bookings.customer_id]
+    );
+    bookings.customer = {
+      name: customer.rows[0].name,
+      email: customer.rows[0].email,
+    };
+    const vehicle = await pool.query(
+      `SELECT vehicle_name,registration_number FROM vehicles WHERE ID=$1`,
+      [bookings.vehicle_id]
+    );
+    bookings.vehicle = {
+      vehicle_name: vehicle.rows[0].vehicle_name,
+      registration_number: vehicle.rows[0].registration_number,
+    };
+  }
+  return result?.rows ?? [];
 };
 
 const updateBookingsIntoDB = async (
   payload: Record<string, unknown>,
   id: string,
   role: string,
-  email:string
+  email: string
 ) => {
-     
   const booking = await pool.query(`SELECT * FROM bookings WHERE ID=$1`, [id]);
-  const bookingUser = await pool.query(`SELECT * FROM users WHERE ID=$1`, [booking.rows[0].customer_id]);
-  console.log({bookingUser:bookingUser.rows[0].email});
+  const bookingUser = await pool.query(`SELECT * FROM users WHERE ID=$1`, [
+    booking.rows[0].customer_id,
+  ]);
+  console.log({ bookingUser: bookingUser.rows[0].email });
   console.log(email);
-  if(bookingUser.rows[0].email!==email && role ==='customer'){
-    throw new Error("You are not authorized!")
+  if (bookingUser.rows[0].email !== email && role === "customer") {
+    throw new Error("You are not authorized!");
   }
   const today = new Date();
   const rentStartDate = booking.rows[0].rent_start_date;

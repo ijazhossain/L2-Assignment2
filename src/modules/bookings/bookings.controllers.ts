@@ -29,7 +29,7 @@ const createVehicle = async (req: Request, res: Response) => {
 const getBookings = async (req: Request, res: Response) => {
   try {
     const { role, id } = req.user;
-    const data = await bookingsServices.getBookingsFromDB(role, id);
+    const data = await bookingsServices.getBookingsFromDB(req.user);
     let message;
     if (role === "admin") {
       message = "Bookings are retrieved successfully";
