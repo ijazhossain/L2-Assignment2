@@ -1,4 +1,4 @@
-# Project Name
+# Project Name: Car rental system
 
 **Live URL:** https://car-rental-system-lovat.vercel.app/  
 **GitHub Repository:** https://github.com/ijazhossain/L2-Assignment2
@@ -133,12 +133,7 @@ You can test the APIs using **Postman**, **Thunder Client**, or **Insomnia**.
 http
 Authorization: Bearer <your_jwt_token>
 ```
-## 🔗 What You Need to Provide
 
-- **GitHub Repository Link:** https://github.com/ijazhossain/L2-Assignment2  
-- **Live Deployment Link:** https://car-rental-system-lovat.vercel.app/  
-
----
 
 ## 👤 Author
 
